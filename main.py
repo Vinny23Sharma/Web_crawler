@@ -4,14 +4,12 @@ import requests
 import re
 
 app = Flask(__name__, static_folder="static", template_folder="templates")
-pages = set()
-url_received = ""
 
 
 @app.route('/', methods=["POST", "GET"])
 def index():
     if request.method == 'POST':
-        global url_received
+        pages = set()
         url_received = request.form.get("url")
         print(url_received)
 
