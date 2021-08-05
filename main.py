@@ -1,13 +1,13 @@
-from flask import Flask, render_template, request, jsonify, abort, make_response
-from bs4 import BeautifulSoup
-import requests
 import re
+import requests
+from bs4 import BeautifulSoup
+from flask import Flask, render_template, request, jsonify, make_response
 
 app = Flask(__name__, static_folder="static", template_folder="templates")
+pages = set()
 
 
 def get_all_links(url_received):
-    pages = set()
     pattern = re.compile("^(/)")
     html = requests.get(url_received).text
     soup = BeautifulSoup(html, 'html.parser')
@@ -16,20 +16,26 @@ def get_all_links(url_received):
         if "href" in link.attrs:
             if link.attrs["href"] not in pages:
                 new_page = link.attrs["href"]
-                print(url_received + new_page)
-                pages.add(url_received + new_page)
+                absolute_link = url_received + new_page
+                print(absolute_link)
+                pages.add(absolute_link)
+
+                if len(pages) < 100:
+                    get_all_links(absolute_link)
+                    # print(len(pages))
 
     return pages
 
 
 @app.route('/', methods=["POST", "GET"])
 def index():
+    pages.clear()
     if request.method == 'POST':
         url_received = request.form.get("url")
         print(url_received)
 
-        pages = get_all_links(url_received)
-        print(pages)
+        links = get_all_links(url_received)
+        # print(links)
 
     return render_template("index.html", title="verification")
 
@@ -40,9 +46,9 @@ def get():
     if not url_received:
         return make_response({"message": "please provide a url"}, 400)
 
-    pages = get_all_links(url_received=url_received)
+    links = get_all_links(url_received=url_received)
 
-    return jsonify({"response": list(pages)})
+    return jsonify({"response": list(links)})
 
 
 if __name__ == '__main__':
