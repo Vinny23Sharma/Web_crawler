@@ -13,16 +13,17 @@ def get_all_links(url_received):
     soup = BeautifulSoup(html, 'html.parser')
 
     for link in soup.find_all("a", href=pattern):
+
+        if len(pages) >= 100:
+            return pages
+
         if "href" in link.attrs:
             if link.attrs["href"] not in pages:
                 new_page = link.attrs["href"]
                 absolute_link = url_received + new_page
                 print(absolute_link)
                 pages.add(absolute_link)
-
-                if len(pages) < 100:
-                    get_all_links(absolute_link)
-                    # print(len(pages))
+                get_all_links(absolute_link)
 
     return pages
 
@@ -35,8 +36,8 @@ def index():
         print(url_received)
 
         links = get_all_links(url_received)
+        print(len(links))
         return render_template("links.html", data=links)
-        # print(links)
 
     return render_template("index.html", title="verification")
 
