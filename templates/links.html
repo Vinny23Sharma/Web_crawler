@@ -26,16 +26,23 @@
          <tr>
             <th>S.NO.</th>
             <th class="text center">Links</th>
+             <th class="text center">Words</th>
         </tr>
      </thead>
       <tbody>
-      {% for item in data %}
-       <tr>
-            <td>{{ loop.index0 + 1}}</td>
-            <td><a href={{item}}>{{item}}</a></td>
-        </tr>
-      {% endfor %}
-    </tbody>
 
+
+
+        {% for key, value in data.items() %}
+            <tr>
+                <td>{{ loop.index0 + 1}}</td>
+                <td><a href={{key}}>{{key}}</a></td>
+                <td><a href={{value}}>{{value}}</a></td>
+            </tr>
+        {% endfor %}
+
+
+      </tbody>
+    </table>
     </body>
 </html>

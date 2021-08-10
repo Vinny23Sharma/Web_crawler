@@ -4,7 +4,13 @@ from bs4 import BeautifulSoup
 from flask import Flask, render_template, request, jsonify, make_response
 
 app = Flask(__name__, static_folder="static", template_folder="templates")
-pages = set()
+pages = dict()
+
+
+def get_num_of_words(link: str):
+    num_of_words = 0
+    # TODO: Find Number Of words Here
+    return num_of_words
 
 
 def get_all_links(url_received, num_of_links: int):
@@ -21,8 +27,8 @@ def get_all_links(url_received, num_of_links: int):
             if link.attrs["href"] not in pages:
                 new_page = link.attrs["href"]
                 absolute_link = url_received + new_page
-                print(absolute_link)
-                pages.add(absolute_link)
+                num_of_words = get_num_of_words(absolute_link)
+                pages[absolute_link] = num_of_words
                 get_all_links(absolute_link, num_of_links)
 
     return pages
@@ -37,7 +43,7 @@ def index():
 
         links = get_all_links(url_received=url_received, num_of_links=num_of_links)
         return render_template("links.html", data=links)
-    #
+
     return render_template("index.html", title="verification")
 
 
