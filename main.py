@@ -37,7 +37,7 @@ def index():
 
         links = get_all_links(url_received=url_received, num_of_links=num_of_links)
         return render_template("links.html", data=links)
-
+    #
     return render_template("index.html", title="verification")
 
 
