@@ -1,4 +1,7 @@
 import re
+from string import punctuation
+from collections import Counter
+
 import requests
 from bs4 import BeautifulSoup
 from flask import Flask, render_template, request, jsonify, make_response
@@ -8,9 +11,19 @@ pages = dict()
 
 
 def get_num_of_words(link: str):
-    num_of_words = 0
-    # TODO: Find Number Of words Here
-    return num_of_words
+    html = requests.get(link).text
+    soup = BeautifulSoup(html, 'html.parser')
+
+    # We get the words within paragraphs
+    text_p = (''.join(s.findAll(text=True)) for s in soup.findAll('p'))
+    c_p = Counter((x.rstrip(punctuation).lower() for y in text_p for x in y.split()))
+
+    # We get the words within divs
+    text_div = (''.join(s.findAll(text=True)) for s in soup.findAll('div'))
+    c_div = Counter((x.rstrip(punctuation).lower() for y in text_div for x in y.split()))
+
+    total = c_div + c_p
+    return len(total)
 
 
 def get_all_links(url_received, num_of_links: int):
