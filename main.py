@@ -91,7 +91,7 @@ def get():
         return jsonify({"total_links_fetched": len(links), "data": response})
 
     except ErrorException:
-        return jsonify({'message': 'some error has occurred'}, 500)
+        return jsonify({'message': 'something went wrong'}, 500)
 
 
 if __name__ == '__main__':
