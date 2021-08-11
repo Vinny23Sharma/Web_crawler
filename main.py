@@ -10,6 +10,10 @@ app = Flask(__name__, static_folder="static", template_folder="templates")
 pages = dict()
 
 
+class ErrorException(Exception):
+    pass
+
+
 def get_num_of_words(link: str):
     html = requests.get(link).text
     soup = BeautifulSoup(html, 'html.parser')
@@ -62,16 +66,33 @@ def index():
 
 @app.route('/links')
 def get():
-    url_received = request.args.get('url')
-    num_of_links = int(request.args.get('num_of_links'))
+    try:
+        url_received = request.args.get('url')
+        links_number = request.args.get('links')
 
-    if not url_received:
-        return make_response({"message": "please provide a url"}, 400)
+        if not url_received:
+            return make_response({"message": "please provide a url"}, 400)
 
-    links = get_all_links(url_received=url_received, num_of_links=num_of_links)
+        if not links_number:
+            return make_response({'message': 'please provide number of links that you want'}, 400)
 
-    return jsonify({"response": list(links)})
+        num_of_links = int(links_number)
+        links = get_all_links(url_received=url_received, num_of_links=num_of_links)
+
+        response = []
+        for link in links:
+            response.append(
+                {
+                    "link": link,
+                    "count of words in page": links[link]
+                }
+            )
+
+        return jsonify({"total_links_fetched": len(links), "data": response})
+
+    except ErrorException:
+        return jsonify({'message': 'some error has occurred'}, 500)
 
 
 if __name__ == '__main__':
-    app.run(port=5000, debug=True)
+    app.run()
